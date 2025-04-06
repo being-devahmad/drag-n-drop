@@ -1,8 +1,17 @@
+"use client";
+
 import { useState } from "react";
 import { useDrop } from "react-dnd";
 import ShiftItem from "./ShiftItem";
 
-const ScheduleTable = ({ days, users, shifts, onCellClick, onMoveShift }) => {
+const ScheduleTable = ({
+  days,
+  users,
+  shifts,
+  onCellClick,
+  onMoveShift,
+  weeklyTotals,
+}) => {
   const [hoveredCell, setHoveredCell] = useState(null);
 
   const handleMouseEnter = (userId, day) => {
@@ -307,7 +316,7 @@ const ScheduleTable = ({ days, users, shifts, onCellClick, onMoveShift }) => {
                   <polyline points="12 6 12 12 16 14" />
                 </svg>
                 <span className="font-medium text-gray-700">Hours</span>
-                <span className="ml-2 text-gray-700">-12.00</span>
+                <span className="ml-2 text-gray-700">{weeklyTotals}</span>
               </div>
             </td>
           </tr>

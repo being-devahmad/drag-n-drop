@@ -1,22 +1,19 @@
-import { useState, useEffect } from "react";
+"use client"
 
-const Sidebar = ({
-  isOpen,
-  onClose,
-  selectedDate,
-  selectedUser,
-  onPublish,
-}) => {
+import { useState, useEffect } from "react"
+
+const Sidebar = ({ isOpen, onClose, selectedDate, selectedUser, onPublish }) => {
   const [formData, setFormData] = useState({
     title: "",
     startTime: "09:00:00",
     endTime: "05:00:00",
     note: "",
     color: "bg-green-400",
-  });
+  })
 
-  const [showColorPicker, setShowColorPicker] = useState(false);
-  const [formattedDate, setFormattedDate] = useState("");
+  const [showColorPicker, setShowColorPicker] = useState(false)
+  const [formattedDate, setFormattedDate] = useState("")
+  const [displayDate, setDisplayDate] = useState("")
 
   // Available colors for shifts
   const colors = [
@@ -25,35 +22,42 @@ const Sidebar = ({
     { name: "Blue", value: "bg-blue-500" },
     { name: "Red", value: "bg-red-500" },
     { name: "Purple", value: "bg-purple-500" },
-  ];
+  ]
 
   // Update form when selected date or user changes
   useEffect(() => {
     if (selectedDate) {
-      const [month, day] = selectedDate.split("/");
-      setFormattedDate(`${day}/${month}/2025`);
+      // Format date for input field (DD/MM/YYYY)
+      const [month, day] = selectedDate.split("/")
+      setFormattedDate(`${day}/${month}/2025`)
+
+      // Format date for display (Day, Month DD, YYYY)
+      const date = new Date(2025, Number.parseInt(month) - 1, Number.parseInt(day))
+      const dayName = date.toLocaleDateString("en-US", { weekday: "long" })
+      const monthName = date.toLocaleDateString("en-US", { month: "short" })
+      setDisplayDate(`${dayName}, ${monthName} ${day}, 2025`)
     }
-  }, [selectedDate]);
+  }, [selectedDate])
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
     setFormData({
       ...formData,
       [name]: value,
-    });
-  };
+    })
+  }
 
   const handleColorSelect = (color) => {
     setFormData({
       ...formData,
       color,
-    });
-    setShowColorPicker(false);
-  };
+    })
+    setShowColorPicker(false)
+  }
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    onPublish(formData);
+    e.preventDefault()
+    onPublish(formData)
 
     // Reset form
     setFormData({
@@ -62,36 +66,33 @@ const Sidebar = ({
       endTime: "05:00:00",
       note: "",
       color: "bg-green-400",
-    });
-  };
+    })
+  }
 
   // Calculate hours between start and end time
   const calculateHours = () => {
     try {
-      const [startHours, startMinutes] = formData.startTime
-        .split(":")
-        .map(Number);
-      const [endHours, endMinutes] = formData.endTime.split(":").map(Number);
+      const [startHours, startMinutes] = formData.startTime.split(":").map(Number)
+      const [endHours, endMinutes] = formData.endTime.split(":").map(Number)
 
-      let hours = endHours - startHours;
-      let minutes = endMinutes - startMinutes;
+      let hours = endHours - startHours
+      let minutes = endMinutes - startMinutes
 
       if (minutes < 0) {
-        hours -= 1;
-        minutes += 60;
+        hours -= 1
+        minutes += 60
       }
 
       if (hours < 0) {
-        hours += 24; // Assuming shift can go to next day
+        hours += 24 // Assuming shift can go to next day
       }
 
-      return `${hours.toString().padStart(2, "0")}:${minutes
-        .toString()
-        .padStart(2, "0")} Hours`;
+      return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")} Hours`
     } catch (error) {
-      return "20:00 Hours"; // Default fallback
+      console.log(error)
+      return "20:00 Hours" // Default fallback
     }
-  };
+  }
 
   return (
     <div
@@ -100,13 +101,10 @@ const Sidebar = ({
       }`}
     >
       <div className="flex flex-col h-full">
-        {/* Header */}
+        {/* Header with dynamic date */}
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center">
-            <button
-              onClick={onClose}
-              className="p-2 text-gray-500 hover:text-gray-700"
-            >
+            <button onClick={onClose} className="p-2 text-gray-500 hover:text-gray-700">
               <svg
                 width="24"
                 height="24"
@@ -121,7 +119,7 @@ const Sidebar = ({
                 <path d="M12 19l-7-7 7-7" />
               </svg>
             </button>
-            <h2 className="text-xl font-medium ml-2">Friday, Mar 28, 2025</h2>
+            <h2 className="text-xl font-medium ml-2">{displayDate}</h2>
           </div>
         </div>
 
@@ -210,9 +208,7 @@ const Sidebar = ({
                 className="w-full p-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
-            <div className="col-span-2 text-right text-gray-700 font-medium">
-              {calculateHours()}
-            </div>
+            <div className="col-span-2 text-right text-gray-700 font-medium">{calculateHours()}</div>
           </div>
 
           <div className="mb-6">
@@ -272,9 +268,7 @@ const Sidebar = ({
                         className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
                         onClick={() => handleColorSelect(color.value)}
                       >
-                        <div
-                          className={`w-6 h-6 rounded-full ${color.value} mr-2`}
-                        ></div>
+                        <div className={`w-6 h-6 rounded-full ${color.value} mr-2`}></div>
                         <span>{color.name}</span>
                       </div>
                     ))}
@@ -291,10 +285,7 @@ const Sidebar = ({
             <div className="flex items-center p-2 border rounded-md bg-gray-50">
               <div className="px-3 py-1 bg-gray-200 rounded-md flex items-center">
                 <span>{selectedUser?.name}</span>
-                <button
-                  type="button"
-                  className="ml-1 text-gray-500 hover:text-gray-700"
-                >
+                <button type="button" className="ml-1 text-gray-500 hover:text-gray-700">
                   <svg
                     width="16"
                     height="16"
@@ -324,10 +315,7 @@ const Sidebar = ({
               placeholder="Type here"
               className="w-full p-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 min-h-[100px]"
             ></textarea>
-            <button
-              type="button"
-              className="flex items-center mt-2 text-blue-600 hover:text-blue-800"
-            >
+            <button type="button" className="flex items-center mt-2 text-blue-600 hover:text-blue-800">
               <svg
                 className="w-5 h-5 mr-1"
                 viewBox="0 0 24 24"
@@ -359,16 +347,14 @@ const Sidebar = ({
           >
             Save Draft
           </button>
-          <button
-            type="button"
-            className="flex items-center text-blue-600 hover:text-blue-800"
-          >
+          <button type="button" className="flex items-center text-blue-600 hover:text-blue-800">
             <span>Save as template</span>
           </button>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar
+
